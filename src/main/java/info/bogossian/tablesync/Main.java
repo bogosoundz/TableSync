@@ -1,5 +1,7 @@
 package info.bogossian.tablesync;
 
+import info.bogossian.tablesync.model.dao.ReaderDAO;
+import info.bogossian.tablesync.model.dao.WriterDAO;
 import info.bogossian.tablesync.model.domain.Attribute;
 import info.bogossian.tablesync.model.domain.DateAttribute;
 import info.bogossian.tablesync.model.domain.DoubleAttribute;
@@ -18,63 +20,21 @@ public class Main {
 
 	/**
 	 * @param args
+	 * @throws ClassNotFoundException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ClassNotFoundException {
 		// TODO Auto-generated method stub
 		Main main = new Main();
-		main.read();
+		main.execute();
 	}
 	
-	public void read()
+	public void execute() throws ClassNotFoundException
 	{
-		try {
+		ReaderDAO r = new ReaderDAO(new WriterDAO());
+		r.copyTableData();
 		
-			Connection conn =
-		       DriverManager.getConnection("jdbc:mysql://terra.dpi.inpe.br/terra?" +
-		                                   "user=proarco&password=at42vx12");
+	}
 
-			System.out.println(conn.isValid(0));
-			String sql="select * from focosAtributos limit 10";
-			PreparedStatement pstmt = conn.prepareStatement(sql);
-			ResultSet rs = pstmt.executeQuery();
-			ResultSetMetaData rsmd = rs.getMetaData();
-			
-			ArrayList<ArrayList<Attribute>> resultList = new ArrayList<ArrayList<Attribute>>();
-			while(rs.next())
-			{
-				ArrayList<Attribute> attributes = new ArrayList<Attribute>();
-				for (int i = 0; i < rsmd.getColumnCount(); i++) {
-					Attribute attribute = Attribute.getAttribute(rsmd.getColumnTypeName(i));
-					attribute.setName(rsmd.getColumnName(i));
-					readAttributesValues(attribute, rs);
-					attributes.add(attribute);
-				}
-				resultList.add(attributes);
-			}
-			
-		} catch (SQLException ex) {
-		    // handle any errors
-		    System.out.println("SQLException: " + ex.getMessage());
-		    System.out.println("SQLState: " + ex.getSQLState());
-		    System.out.println("VendorError: " + ex.getErrorCode());
-		}
-	}
-	private void readAttributesValues(Attribute attribute, ResultSet rs) throws SQLException
-	{
-		
-		if (attribute instanceof StringAttribute) {
-			((StringAttribute) attribute).setValue(rs.getString(attribute.getName()));
-		}
-		if (attribute instanceof DoubleAttribute) {
-			((DoubleAttribute) attribute).setValue(rs.getDouble(attribute.getName()));
-		}
-		if (attribute instanceof IntegerAttribute) {
-			((IntegerAttribute) attribute).setValue(rs.getInt(attribute.getName()));
-		}
-		if (attribute instanceof DateAttribute) {
-			((DateAttribute) attribute).setValue(rs.getDate(attribute.getName()));
-		}
-	}
 	
 	
 

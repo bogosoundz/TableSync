@@ -41,6 +41,10 @@ public class Attribute {
 		{
 			attribute = new DateAttribute();
 		} 
+		else if("java.sql.TimeStamp".equalsIgnoreCase(type))
+		{
+			attribute = new TimestampAttribute();
+		} 
 		if(attribute==null)
 		{
 			throw new NullPointerException("Could not determine the attribute type: " +type);
